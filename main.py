@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-TOKEN = "DEIN_BOT_TOKEN"
+TOKEN = "7328230261:AAHk1T0_v1yO3fvR3_aEOGkjPQK01ay3tEw"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("👋 Willkommen bei PromilleBot! Bereit für Disziplin?")
