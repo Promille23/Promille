@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
 TOKEN = "7328230261:AAG1v58gRgFWl9f6uUd4IM2mAyfJnPn1-RI"
-WEBHOOK_URL = "https://DEIN_RENDER_URL.onrender.com"  # hier DEINE Render-URL eintragen!
+WEBHOOK_URL = "WEBHOOK_URL = "https://promillebot.onrender.com"  # hier DEINE Render-URL eintragen!
 PORT = 443
 
 POINTS_FILE = "points.json"
