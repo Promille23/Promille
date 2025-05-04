@@ -2,7 +2,7 @@ import random
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-TOKEN = "DEIN_BOT_TOKEN"
+TOKEN = "7328230261:AAHk1T0_v1yO3fvR3_aEOGkjPQK01ay3tEw"
 
 START_MESSAGES = [
     "💀 Aufstehen, du Schwächling! Niemand rettet dich. MACH. DEN. JOB.",
