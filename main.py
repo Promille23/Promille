@@ -4,7 +4,7 @@ from datetime import datetime, time
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-TOKEN = "7328230261:AAHk1T0_v1yO3fvR3_aEOGkjPQK01ay3tEw"
+TOKEN = "7328230261:AAG1v58gRgFWl9f6uUd4IM2mAyfJnPn1-RI"
 POINTS_FILE = "points.json"
 
 GOGGINS_MESSAGES = [
