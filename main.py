@@ -1,8 +1,9 @@
 import json
 import random
 from datetime import datetime, time
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 TOKEN = "7328230261:AAG1v58gRgFWl9f6uUd4IM2mAyfJnPn1-RI"
 WEBHOOK_URL = "https://promille.onrender.com"
@@ -16,7 +17,6 @@ GOGGINS_MESSAGES = [
     "🔥 Dein innerer Schweinehund schreit? Schrei lauter, Bro! Keiner wird dich jemals bemitleiden.",
     "💪 Jeder Tag ist Krieg. DU entscheidest, ob du Opfer oder Killer bist.",
     "🚀 Niemand interessiert sich, wie du dich fühlst. AUFSTEHEN. TRAINIEREN. LIEFERN.",
-    "⏰ 5 Uhr? Kinderspiel. Zeig mir, dass du ein verdammtes Tier bist.",
     "🥂 Während andere schlafen, baust du deine Legende. KEEP HAMMERING, MOTHERF*CKER.",
     "⚡ Schmerz ist temporär. Aufgeben ist für immer. Also BEISS, Bro!",
     "🏆 Du willst Resultate? Dann hör auf zu labern und fang an zu SCHINDEN.",
@@ -39,6 +39,28 @@ SPORT_CODES = [
     "🍌 Bananenbieger",
     "🐟 Fischschlürfer",
     "🚀 Raketenmurmel"
+]
+
+MOTIVATION_QUOTES = [
+    "💥 *David Goggins*: „Be comfortable being uncomfortable.“",
+    "🔥 *Jocko Willink*: „Discipline equals freedom.“",
+    "🏆 *Kobe Bryant*: „The moment you give up is the moment you let someone else win.“",
+    "⚡ *Muhammad Ali*: „Suffer now and live the rest of your life as a champion.“",
+    "🚀 *Arnold Schwarzenegger*: „The worst thing I can be is the same as everybody else.“",
+    "💀 *Mike Tyson*: „Discipline is doing what you hate but doing it like you love it.“",
+    "🎯 *Jordan Peterson*: „Compare yourself to who you were yesterday, not to who someone else is today.“"
+]
+
+GOGGINS_YES = [
+    "🔥 STARK, Bro! Bleib savage! Du bist der Hammer, keep hammering! 💪",
+    "💪 RESPEKT! Jedes Training macht dich härter. Stay hard!",
+    "🏆 So geht das, Bro! Niemand wird dich je stoppen. No excuses!"
+]
+
+GOGGINS_NO = [
+    "💀 Bro... ich hab gedacht, du willst einer der Härtesten sein? Dann BEWEIS ES!",
+    "❌ Ausreden killen Träume. Raus aus der Komfortzone, rein ins Leiden!",
+    "⚡ Kein Bock? Kein Mitleid. Dein altes Ich will dich zurückziehen – KÄMPF DAGEGEN!"
 ]
 
 def load_points():
@@ -105,11 +127,53 @@ async def reset_points(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_points({})
     await update.message.reply_text("🧨 Punkte wurden zurückgesetzt, Bro! Neue Runde, neues Spiel!")
 
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == "trained_yes":
+        msg = random.choice(GOGGINS_YES)
+        await query.edit_message_text(f"✅ {msg}")
+    elif query.data == "trained_no":
+        msg = random.choice(GOGGINS_NO)
+        await query.edit_message_text(f"❌ {msg}")
+
+async def send_daily_motivation(app):
+    quote = random.choice(MOTIVATION_QUOTES)
+    chats = load_chats()
+    for chat_id in chats:
+        try:
+            await app.bot.send_message(chat_id=chat_id, text=f"🔥 *Motivation des Tages* 🔥\n\n{quote}", parse_mode="Markdown")
+        except Exception as e:
+            print(f"Fehler beim Senden an {chat_id}: {e}")
+
+async def send_training_check(app):
+    chats = load_chats()
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("✅ Ja, ich hab trainiert!", callback_data="trained_yes")],
+        [InlineKeyboardButton("❌ Nein, noch nicht!", callback_data="trained_no")]
+    ])
+    for chat_id in chats:
+        try:
+            await app.bot.send_message(
+                chat_id=chat_id,
+                text="⚡ Hey Bro, hast du heute schon trainiert? Kein Entkommen! 💪",
+                reply_markup=keyboard
+            )
+        except Exception as e:
+            print(f"Fehler beim Senden an {chat_id}: {e}")
+
 if __name__ == '__main__':
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(CommandHandler("leaderboard", leaderboard))
     app.add_handler(CommandHandler("resetpoints", reset_points))
+    app.add_handler(CallbackQueryHandler(button_handler))
+
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(lambda: app.create_task(send_daily_motivation(app)), trigger='cron', hour=13, minute=0)
+    scheduler.add_job(lambda: app.create_task(send_training_check(app)), trigger='cron', hour=18, minute=0)
+    scheduler.start()
 
     app.run_webhook(
         listen="0.0.0.0",
