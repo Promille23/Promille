@@ -5,13 +5,30 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
 TOKEN = "7328230261:AAG1v58gRgFWl9f6uUd4IM2mAyfJnPn1-RI"
-WEBHOOK_URL = "WEBHOOK_URL = "https://promillebot.onrender.com"  # hier DEINE Render-URL eintragen!
-PORT = 443
+WEBHOOK_URL = "https://promillebot.onrender.com"  # hier deine Render-URL
 
+PORT = 443
 POINTS_FILE = "points.json"
 CHATS_FILE = "chats.json"
 
-# Deine bisherigen Listen (Sprüche, Fragen, Codes) bleiben unverändert
+# Beispiel-Listen (du kannst hier deine eigenen Inhalte reinpacken)
+GOGGINS_MESSAGES = [
+    "💀 Aufstehen, du Schwächling! Niemand rettet dich. MACH. DEN. JOB.",
+    "🔥 Dein innerer Schweinehund schreit? Schrei lauter, Bro! Keiner wird dich jemals bemitleiden.",
+    "💪 Jeder Tag ist Krieg. DU entscheidest, ob du Opfer oder Killer bist."
+]
+
+MORNING_QUESTIONS = [
+    "💬 Was ist dein Ziel für heute?",
+    "⚡ Was machst du heute besser als gestern?",
+    "🔥 Worauf bist du heute besonders fokussiert?"
+]
+
+SPORT_CODES = [
+    "🐶 Hundeapfel",
+    "🧹 Besenfurz",
+    "🍴 Gabelschiene"
+]
 
 def load_points():
     try:
