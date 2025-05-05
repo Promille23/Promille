@@ -97,7 +97,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         save_chats(chats)
 
     if text == "moin":
-        if time(5, 0) <= now <= time(6, 0):
+        if time(5, 0) <= now <= time(7, 0):
             user_id = str(user.id)
             if user_id not in points:
                 points[user_id] = {"name": user.first_name, "score": 0}
@@ -110,7 +110,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             response = f"{goggins_msg}\n\n{question}\n\n🤪 Code des Tages: {sport_code}"
             await update.message.reply_text(response)
         else:
-            await update.message.reply_text("❌ Zu spät, Bro! Zwischen 5:00 und 6:00 Uhr heißt Disziplin. Versuch’s morgen wieder!")
+            await update.message.reply_text("❌ Zu spät, Bro! Zwischen 5:00 und 7:00 Uhr heißt Disziplin. Versuch’s morgen wieder!")
 
 async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     points = load_points()
