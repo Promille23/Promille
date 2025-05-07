@@ -1,6 +1,7 @@
 import json
 import random
 from datetime import datetime, time
+from zoneinfo import ZoneInfo
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -88,7 +89,7 @@ def save_chats(chats):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     text = update.message.text.lower()
-    now = datetime.now().time()
+    now_berlin = datetime.now(ZoneInfo("Europe/Berlin")).time()
     points = load_points()
     chats = load_chats()
 
@@ -97,7 +98,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         save_chats(chats)
 
     if text == "moin":
-        if time(5, 0) <= now <= time(7, 0):
+        if time(5, 0) <= now_berlin <= time(7, 0):
             user_id = str(user.id)
             if user_id not in points:
                 points[user_id] = {"name": user.first_name, "score": 0}
@@ -110,7 +111,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             response = f"{goggins_msg}\n\n{question}\n\n🤪 Code des Tages: {sport_code}"
             await update.message.reply_text(response)
         else:
-            await update.message.reply_text("❌ Zu spät, Bro! Zwischen 5:00 und 7:00 Uhr heißt Disziplin. Versuch’s morgen wieder!")
+            await update.message.reply_text("❌ Zu spät, Bro! Zwischen 5:00 und 7:00 Uhr (Berlin-Time) heißt Disziplin. Versuch’s morgen wieder!")
 
 async def leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE):
     points = load_points()
@@ -171,8 +172,8 @@ if __name__ == '__main__':
     app.add_handler(CallbackQueryHandler(button_handler))
 
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(lambda: app.create_task(send_daily_motivation(app)), trigger='cron', hour=13, minute=0)
-    scheduler.add_job(lambda: app.create_task(send_training_check(app)), trigger='cron', hour=18, minute=0)
+    scheduler.add_job(lambda: app.create_task(send_daily_motivation(app)), trigger='cron', hour=13, minute=0, timezone='Europe/Berlin')
+    scheduler.add_job(lambda: app.create_task(send_training_check(app)), trigger='cron', hour=18, minute=0, timezone='Europe/Berlin')
     scheduler.start()
 
     app.run_webhook(
